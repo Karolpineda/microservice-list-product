@@ -1,5 +1,6 @@
 const express = require("express");
-const { createProduct } = require("../controllers/productController");
+const axios = require("axios"); // Para hacer peticiones HTTP
+const { listProducts } = require("../controllers/productController");
 const router = express.Router();
 
 /**
@@ -17,7 +18,7 @@ const router = express.Router();
 router.get("/health", (req, res) => {
   return res.status(200).json({
     status: "OK",
-    message: "Hola Juanpabllo",
+    message: "Microservicio de Listado de Productos activo",
   });
 });
 
@@ -25,7 +26,7 @@ router.get("/health", (req, res) => {
  * @swagger
  * /api/products:
  *   post:
- *     summary: Crea un nuevo producto
+ *     summary: Crea un nuevo producto a través del microservicio de creación
  *     tags: [Products]
  *     requestBody:
  *       required: true
@@ -55,8 +56,32 @@ router.get("/health", (req, res) => {
  *       400:
  *         description: Faltan campos obligatorios.
  *       500:
+ *         description: Error en el microservicio de creación.
+ */
+router.post("/products", async (req, res) => {
+  try {
+    // Hacemos una petición HTTP al microservicio de creación
+    const response = await axios.post("http://microservice-create-product/api/products", req.body);
+
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error("Error al comunicarse con el microservicio de creación:", error.message);
+    return res.status(500).json({ message: "Error en el microservicio de creación." });
+  }
+});
+
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Obtiene una lista de todos los productos
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de productos obtenidos exitosamente.
+ *       500:
  *         description: Error interno del servidor.
  */
-router.post("/products", createProduct);
+router.get("/products", listProducts);
 
 module.exports = router;
