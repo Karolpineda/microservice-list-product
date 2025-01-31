@@ -1,5 +1,5 @@
 const express = require("express");
-const axios = require("axios"); // Para hacer peticiones HTTP
+const axios = require("axios");
 const { listProducts } = require("../controllers/productController");
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
  *     tags: [Health]
  *     responses:
  *       200:
- *         description: Retorna un mensaje de estado.
+ *         description: Retorna un mensaje de estado del microservicio de listado de productos.
  *       500:
  *         description: Error interno del servidor.
  */
@@ -26,8 +26,9 @@ router.get("/health", (req, res) => {
  * @swagger
  * /api/products:
  *   post:
- *     summary: Crea un nuevo producto a través del microservicio de creación
+ *     summary: Crea un nuevo producto (redirige al microservicio de creación)
  *     tags: [Products]
+ *     description: Esta ruta redirige la solicitud al microservicio de creación de productos.
  *     requestBody:
  *       required: true
  *       content:
@@ -52,20 +53,18 @@ router.get("/health", (req, res) => {
  *                 example: "2cc42cd1-2e1f-4adb-8623-c63eedb56ff9"
  *     responses:
  *       201:
- *         description: Producto creado exitosamente.
+ *         description: Producto creado exitosamente en el microservicio de creación.
  *       400:
  *         description: Faltan campos obligatorios.
  *       500:
- *         description: Error en el microservicio de creación.
+ *         description: Error en la comunicación con el microservicio de creación.
  */
 router.post("/products", async (req, res) => {
   try {
-    // Hacemos una petición HTTP al microservicio de creación
     const response = await axios.post("http://microservice-create-product/api/products", req.body);
-
     return res.status(response.status).json(response.data);
   } catch (error) {
-    console.error("Error al comunicarse con el microservicio de creación:", error.message);
+    console.error("Error en la comunicación con el microservicio de creación:", error.message);
     return res.status(500).json({ message: "Error en el microservicio de creación." });
   }
 });
@@ -79,6 +78,38 @@ router.post("/products", async (req, res) => {
  *     responses:
  *       200:
  *         description: Lista de productos obtenidos exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Productos obtenidos exitosamente."
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "Producto 1"
+ *                       stock:
+ *                         type: integer
+ *                         example: 100
+ *                       createdBy:
+ *                         type: string
+ *                         format: uuid
+ *                         example: "6fa704f0-5945-41a3-abbe-08120b7f7223"
+ *                       updatedBy:
+ *                         type: string
+ *                         format: uuid
+ *                         example: "2cc42cd1-2e1f-4adb-8623-c63eedb56ff9"
+ *       404:
+ *         description: No se encontraron productos en la base de datos.
  *       500:
  *         description: Error interno del servidor.
  */
