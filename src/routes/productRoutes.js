@@ -1,5 +1,5 @@
 const express = require("express");
-const { updateProduct } = require("../controllers/productController");
+const { listProducts } = require("../controllers/productController");
 const router = express.Router();
 
 /**
@@ -65,6 +65,6 @@ router.get("/health", (req, res) => {
  *       500:
  *         description: Error interno del servidor.
  */
-router.put("/products/:id", updateProduct);
+router.put("/products/:id", listProducts);
 
 module.exports = router;
