@@ -1,34 +1,26 @@
 const Product = require("../models/productModel");
 
-const createProduct = async (req, res) => {
+const listProducts = async (req, res) => {
   try {
-    // Extraemos los campos del body
-    const { name, stock, createdBy, updatedBy } = req.body;
+    // Obtener todos los productos de la base de datos
+    const products = await Product.findAll();
 
-    // Validamos campos obligatorios (al menos name y createdBy)
-    if (!name || !createdBy) {
-      return res.status(400).json({
-        message: "Faltan campos obligatorios (name, createdBy)."
-      });
+    // Si no hay productos, devolver un mensaje adecuado
+    if (products.length === 0) {
+      return res.status(404).json({ message: "No se encontraron productos." });
     }
 
-    const newProduct = await Product.create({
-      name,
-      stock,
-      createdBy,
-      updatedBy
-    });
-
-    return res.status(201).json({
-      message: "Producto creado exitosamente.",
-      product: newProduct
+    // Devolver los productos encontrados
+    return res.status(200).json({
+      message: "Productos obtenidos exitosamente.",
+      products: products
     });
   } catch (error) {
-    console.error("Error al crear producto:", error);
+    console.error("Error al obtener productos:", error);
     return res.status(500).json({
       message: "Error interno del servidor."
     });
   }
 };
 
-module.exports = { createProduct };
+module.exports = { listProducts };
