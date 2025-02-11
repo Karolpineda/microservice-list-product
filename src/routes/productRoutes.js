@@ -65,6 +65,6 @@ router.get("/health", (req, res) => {
  *       500:
  *         description: Error interno del servidor.
  */
-router.put("/products/:id", listProducts);
+router.get("/products", listProducts);
 
 module.exports = router;
