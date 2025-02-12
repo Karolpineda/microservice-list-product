@@ -35,8 +35,8 @@ jobs:
             docker pull karolpineda/microservice-list-product:latest
 
             # 2) Detener y eliminar contenedor previo
-            docker stop product_container || true
-            docker rm product_container || true
+            docker stop list_product_container || true
+            docker rm list_product_container || true
 
             # 3) Generar .env con secretos
             echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
@@ -48,7 +48,7 @@ jobs:
             # Agrega más variables si requieres
 
             # 4) Correr contenedor usando ese .env
-            docker run -d --name product_container \
+            docker run -d --name list_product_container \
               --env-file .env \
               -p 8084:8084 \
               karolpineda/microservice-list-product:latest
